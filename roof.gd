@@ -1,0 +1,8 @@
+extends AnimatedSprite
+
+
+
+func _on_Area2D_area_entered(area):
+	# Destroy block
+	queue_free()
+
