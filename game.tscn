@@ -1,53 +1,199 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=21 format=2]
 
-[ext_resource path="res://sprites/plane.png" type="Texture" id=1]
+[ext_resource path="res://sprites/plane.png" type="Texture2D" id=1]
 [ext_resource path="res://game.gd" type="Script" id=2]
-[ext_resource path="res://sprites/bomb.png" type="Texture" id=3]
-[ext_resource path="res://sprites/ground.png" type="Texture" id=4]
+[ext_resource path="res://sprites/bomb.png" type="Texture2D" id=3]
+[ext_resource path="res://sprites/ground.png" type="Texture2D" id=4]
 [ext_resource path="res://bomb.gd" type="Script" id=5]
+[ext_resource path="res://sprites/clouds2.png" type="Texture2D" id=6]
+[ext_resource path="res://sprites/sky.png" type="Texture2D" id=7]
+[ext_resource path="res://sprites/clouds1..png" type="Texture2D" id=8]
+[ext_resource path="res://audio/plane.wav" type="AudioStream" id=9]
+[ext_resource path="res://audio/explosion.wav" type="AudioStream" id=10]
+[ext_resource path="res://audio/bomb_drop.wav" type="AudioStream" id=11]
+[ext_resource path="res://fonts/ethnocentric rg.otf" type="FontFile" id=12]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 12, 6 )
+extents = Vector2( 12, 8 )
 
 [sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 4, 3 )
 
+[sub_resource type="Curve" id=3]
+min_value = -200.0
+max_value = 200.0
+_data = [ Vector2( 0, 161.963 ), 0.0, -1869.69, 0, 0, Vector2( 1, -139.877 ), -246.778, 0.0, 0, 0 ]
+
+[sub_resource type="Curve" id=4]
+max_value = 2.5
+_data = [ Vector2( 0, 2.38497 ), 0.0, 0.0, 0, 0, Vector2( 1, 0.130368 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="Gradient" id=5]
+offsets = PackedFloat32Array( 0, 0.622084, 1 )
+colors = PackedColorArray( 1, 1, 1, 1, 0.998047, 0.199897, 0.199897, 1, 0.910156, 1, 0, 1 )
+
+[sub_resource type="FontFile" id=6]
+size = 32
+font_data = ExtResource( 12 )
+
+[sub_resource type="FontFile" id=7]
+size = 10
+font_data = ExtResource( 12 )
+
+[sub_resource type="FontFile" id=8]
+font_data = ExtResource( 12 )
+
 [node name="Game" type="Node2D"]
 script = ExtResource( 2 )
 
-[node name="Plane" type="Sprite" parent="."]
-position = Vector2( 20, 20 )
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer3" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0, 1 )
+
+[node name="Sky" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer3"]
+texture = ExtResource( 7 )
+centered = false
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 2, 1 )
+motion_mirroring = Vector2( 320, 0 )
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
+texture = ExtResource( 8 )
+centered = false
+
+[node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.7, 1 )
+motion_mirroring = Vector2( 320, 0 )
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer2"]
+texture = ExtResource( 6 )
+centered = false
+offset = Vector2( 30, 0 )
+
+[node name="Plane" type="Sprite2D" parent="."]
+position = Vector2( -19, -13 )
 texture = ExtResource( 1 )
 __meta__ = {
 "_edit_group_": true
 }
 
-[node name="Area2D" type="Area2D" parent="Plane"]
+[node name="Plane collider" type="Area2D" parent="Plane" groups=["plane"]]
+collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plane/Area2D"]
-position = Vector2( 0, -1 )
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plane/Plane collider"]
 shape = SubResource( 1 )
 
-[node name="Bomb Attachment" type="Position2D" parent="Plane"]
-position = Vector2( -2, 8 )
+[node name="Bomb Attachment" type="Marker2D" parent="Plane"]
+position = Vector2( 0, 5 )
 
-[node name="Bomb" type="Sprite" parent="."]
-position = Vector2( 18, 28 )
+[node name="Flying Sound" type="AudioStreamPlayer" parent="Plane"]
+stream = ExtResource( 9 )
+volume_db = -20.0
+
+[node name="Crash Sound" type="AudioStreamPlayer" parent="Plane"]
+stream = ExtResource( 10 )
+volume_db = -10.0
+
+[node name="Bomb" type="Sprite2D" parent="."]
+position = Vector2( -19, -8 )
 texture = ExtResource( 3 )
 script = ExtResource( 5 )
 __meta__ = {
 "_edit_group_": true
 }
 
-[node name="Area2D" type="Area2D" parent="Bomb"]
+[node name="Bomb collider" type="Area2D" parent="Bomb" groups=["bomb"]]
+collision_mask = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Bomb/Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bomb/Bomb collider"]
 shape = SubResource( 2 )
 
-[node name="Ground" type="Sprite" parent="."]
+[node name="Drop sound" type="AudioStreamPlayer" parent="Bomb"]
+stream = ExtResource( 11 )
+volume_db = -10.0
+
+[node name="Ground" type="Sprite2D" parent="."]
 position = Vector2( 160, 170 )
 texture = ExtResource( 4 )
 
 [node name="Descend Tween" type="Tween" parent="."]
 
+[node name="Startup Tween" type="Tween" parent="."]
+
+[node name="Plane crash particles" type="CPUParticles2D" parent="."]
+position = Vector2( -19, -13 )
+emitting = false
+amount = 100
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+emission_shape = 1
+emission_sphere_radius = 2.0
+spread = 180.0
+gravity = Vector2( 0, 0 )
+initial_velocity = 100.0
+initial_velocity_random = 0.5
+linear_accel = 100.0
+linear_accel_random = 0.2
+linear_accel_curve = SubResource( 3 )
+scale_amount = 2.0
+scale_amount_random = 1.0
+scale_amount_curve = SubResource( 4 )
+color_ramp = SubResource( 5 )
+
+[node name="UI" type="Control" parent="."]
+offset_right = 320.0
+offset_bottom = 180.0
+
+[node name="Game Over" type="VBoxContainer" parent="UI"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="CenterContainer" type="CenterContainer" parent="UI/Game Over"]
+offset_right = 320.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="UI/Game Over/CenterContainer"]
+offset_left = 22.0
+offset_right = 298.0
+offset_bottom = 40.0
+custom_colors/font_color = Color( 0.72549, 0.133333, 0.133333, 1 )
+custom_fonts/font = SubResource( 6 )
+text = "GAME OVER"
+align = 1
+valign = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/Game Over"]
+offset_top = 44.0
+offset_right = 320.0
+offset_bottom = 57.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="UI/Game Over/MarginContainer"]
+offset_right = 320.0
+offset_bottom = 13.0
+custom_colors/font_color = Color( 0.117647, 0.2, 0.796078, 1 )
+custom_fonts/font = SubResource( 7 )
+text = "Press space to continue"
+align = 1
+
+[node name="Stage Cleared" type="CenterContainer" parent="UI"]
+visible = false
+offset_right = 320.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="UI/Stage Cleared"]
+offset_left = 64.0
+offset_top = 9.0
+offset_right = 256.0
+offset_bottom = 30.0
+custom_colors/font_color = Color( 0.0823529, 0.356863, 0.192157, 1 )
+custom_fonts/font = SubResource( 8 )
+text = "Stage Cleared!"
+align = 1
+
+[connection signal="area_entered" from="Plane/Plane collider" to="." method="_on_Plane_collider_area_entered"]
 [connection signal="bomb_exploded" from="Bomb" to="." method="_on_Bomb_bomb_exploded"]
